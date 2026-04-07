@@ -6,13 +6,15 @@ const { validateGame } = require('../utils/validation');
 
 const UPLOADS_DIR = path.resolve('uploads');
 
-// Resolve a file path and verify it stays within the uploads directory
+// Sanitize a file path by extracting only the basename and joining with the
+// trusted uploads directory. This prevents path traversal and ensures all
+// file operations stay within the uploads folder.
 const safeFilePath = (filePath) => {
-  const resolved = path.resolve(filePath);
-  if (!resolved.startsWith(UPLOADS_DIR + path.sep) && resolved !== UPLOADS_DIR) {
+  const basename = path.basename(filePath);
+  if (!basename || !basename.endsWith('.lua')) {
     throw new Error('Invalid file path');
   }
-  return resolved;
+  return path.join(UPLOADS_DIR, basename);
 };
 
 // @desc    Upload a new game
